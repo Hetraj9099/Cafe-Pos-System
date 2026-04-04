@@ -1,10 +1,12 @@
 const { Pool } = require('pg');
 const env = require('./env');
 
-const pool = env.databaseUrl
+const databaseUrl = env.databaseUrl || process.env.DATABASE_URL || '';
+
+const pool = databaseUrl
   ? new Pool({
-      connectionString: env.databaseUrl,
-      ssl: env.databaseUrl.includes('neon.tech')
+      connectionString: databaseUrl,
+      ssl: databaseUrl.includes('neon.tech')
         ? { rejectUnauthorized: false }
         : undefined
     })

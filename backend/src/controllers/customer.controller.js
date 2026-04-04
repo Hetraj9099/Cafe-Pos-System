@@ -1,52 +1,55 @@
 const customerModel = require('../models/customer.model');
 
-const listCustomers = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Customer listing controller placeholder',
-      resource: customerModel.tableName
-    }
-  });
+const listCustomers = async (req, res, next) => {
+  try {
+    const data = await customerModel.listCustomers();
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getCustomerById = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Customer details controller placeholder',
-      id: req.params.id
+const getCustomerById = async (req, res, next) => {
+  try {
+    const data = await customerModel.findById(req.params.id);
+
+    if (!data) {
+      const error = new Error('Customer not found.');
+      error.statusCode = 404;
+      throw error;
     }
-  });
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createCustomer = async (req, res) => {
-  res.status(201).json({
-    success: true,
-    data: {
-      message: 'Customer creation controller placeholder'
-    }
-  });
+const createCustomer = async (req, res, next) => {
+  try {
+    const data = await customerModel.createCustomer(req.body);
+    res.status(201).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const updateCustomer = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Customer update controller placeholder',
-      id: req.params.id
-    }
-  });
+const updateCustomer = async (req, res, next) => {
+  try {
+    const data = await customerModel.updateCustomer(req.params.id, req.body);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const deleteCustomer = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Customer deletion controller placeholder',
-      id: req.params.id
-    }
-  });
+const deleteCustomer = async (req, res, next) => {
+  try {
+    const data = await customerModel.deleteCustomer(req.params.id);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
