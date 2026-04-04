@@ -49,8 +49,13 @@ const getLatestOrdersByTable = async () => {
 const getActiveReservations = async (fromTime, toTime) => {
   const { rows } = await query(
     `
-      SELECT *
-      FROM reservations
+      SELECT
+        r.*,
+        c.name AS customer_name,
+        c.phone AS customer_phone,
+        c.email AS customer_email
+      FROM reservations r
+      LEFT JOIN customers c ON c.id = r.customer_id
       WHERE status = 'reserved'
         AND reservation_time BETWEEN $1 AND $2
     `,

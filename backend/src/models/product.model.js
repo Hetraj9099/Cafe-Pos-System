@@ -18,19 +18,61 @@ const listProducts = async ({ activeOnly = false } = {}) => {
   return rows;
 };
 
+const listCuisines = async () => {
+  const { rows } = await query('SELECT * FROM cuisines ORDER BY name ASC');
+  return rows;
+};
+
+const findCuisineByName = async (name) => {
+  const { rows } = await query('SELECT * FROM cuisines WHERE LOWER(name) = LOWER($1) LIMIT 1', [
+    name
+  ]);
+  return rows[0] || null;
+};
+
+const createCuisine = async (name) => {
+  const { rows } = await query(
+    `
+      INSERT INTO cuisines (name)
+      VALUES ($1)
+      ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+      RETURNING *
+    `,
+    [name]
+  );
+
+  return rows[0];
+};
+
 const findById = async (id) => {
   const { rows } = await query('SELECT * FROM products WHERE id = $1 LIMIT 1', [id]);
   return rows[0] || null;
 };
 
-const createProduct = async ({ name, category, price, tax, prepTimeMinutes, isActive = true }) => {
+const createProduct = async ({
+  name,
+  category,
+  imageUrl = null,
+  price,
+  tax,
+  prepTimeMinutes,
+  isActive = true
+}) => {
   const { rows } = await query(
     `
-      INSERT INTO products (name, category, price, tax, prep_time_minutes, is_active)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO products (
+        name,
+        category,
+        image_url,
+        price,
+        tax,
+        prep_time_minutes,
+        is_active
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
     `,
-    [name, category, price, tax, prepTimeMinutes, isActive]
+    [name, category, imageUrl, price, tax, prepTimeMinutes, isActive]
   );
 
   return rows[0];
@@ -63,12 +105,12 @@ const getProductAnalytics = async () => {
         p.id,
         p.name,
         p.category,
-        COUNT(oi.id) AS items_sold,
+        COUNT(oi.id)::int AS items_sold,
         COALESCE(SUM(oi.total_price), 0) AS revenue
       FROM products p
       LEFT JOIN order_items oi ON oi.product_id = p.id
       GROUP BY p.id
-      ORDER BY revenue DESC, items_sold DESC
+      ORDER BY items_sold DESC, revenue DESC, p.name ASC
       LIMIT 10
     `
   );
@@ -78,6 +120,9 @@ const getProductAnalytics = async () => {
 
 module.exports = {
   listProducts,
+  listCuisines,
+  findCuisineByName,
+  createCuisine,
   findById,
   createProduct,
   updateProduct,
