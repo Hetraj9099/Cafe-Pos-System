@@ -37,6 +37,25 @@ const validationMiddleware = (schema = {}) => {
       if (rules.enum && !rules.enum.includes(value)) {
         errors.push(`${field} must be one of: ${rules.enum.join(', ')}.`);
       }
+
+      if (rules.minLength && typeof value === 'string' && value.trim().length < rules.minLength) {
+        errors.push(`${field} must be at least ${rules.minLength} characters.`);
+      }
+
+      if (rules.maxLength && typeof value === 'string' && value.trim().length > rules.maxLength) {
+        errors.push(`${field} must be at most ${rules.maxLength} characters.`);
+      }
+
+      if (rules.pattern && typeof value === 'string' && !rules.pattern.test(value.trim())) {
+        errors.push(rules.patternMessage || `${field} format is invalid.`);
+      }
+
+      if (typeof rules.validate === 'function') {
+        const result = rules.validate(value, req.body);
+        if (typeof result === 'string') {
+          errors.push(result);
+        }
+      }
     });
 
     if (errors.length > 0) {
