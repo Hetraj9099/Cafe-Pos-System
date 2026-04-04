@@ -2,21 +2,29 @@ const orderService = require('../services/order.service');
 
 const listOrders = async (req, res, next) => {
   try {
-    const data = await orderService.listOrders();
+    const data = await orderService.listOrders(req.query);
     res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);
   }
 };
 
-const getOrderById = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Order details controller placeholder',
-      id: req.params.id
-    }
-  });
+const getKitchenOrders = async (req, res, next) => {
+  try {
+    const data = await orderService.getKitchenOrders();
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getOrderById = async (req, res, next) => {
+  try {
+    const data = await orderService.getOrderById(req.params.id);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const createOrder = async (req, res, next) => {
@@ -28,30 +36,62 @@ const createOrder = async (req, res, next) => {
   }
 };
 
-const updateOrder = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Order update controller placeholder',
-      id: req.params.id
-    }
-  });
+const addOrderItem = async (req, res, next) => {
+  try {
+    const data = await orderService.addOrderItem(req.params.id, req.body);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const deleteOrder = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Order deletion controller placeholder',
-      id: req.params.id
-    }
-  });
+const removeOrderItem = async (req, res, next) => {
+  try {
+    const data = await orderService.removeOrderItem(req.params.id, req.params.itemId);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateOrderStatus = async (req, res, next) => {
+  try {
+    const data = await orderService.updateOrderStatus(req.params.id, req.body.status);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const markOrderItemPrepared = async (req, res, next) => {
+  try {
+    const data = await orderService.markItemPrepared(
+      req.params.itemId,
+      req.body.isPrepared !== false
+    );
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteOrder = async (req, res, next) => {
+  try {
+    const data = await orderService.deleteOrder(req.params.id);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
   listOrders,
+  getKitchenOrders,
   getOrderById,
   createOrder,
-  updateOrder,
+  addOrderItem,
+  removeOrderItem,
+  updateOrderStatus,
+  markOrderItemPrepared,
   deleteOrder
 };

@@ -9,49 +9,42 @@ const listPayments = async (req, res, next) => {
   }
 };
 
-const getPaymentById = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Payment details controller placeholder',
-      id: req.params.id
-    }
-  });
-};
-
-const createPayment = async (req, res, next) => {
+const processPayment = async (req, res, next) => {
   try {
-    const data = await paymentService.createPayment(req.body);
+    const data = await paymentService.processPayment(req.body);
     res.status(201).json({ success: true, data });
   } catch (error) {
     next(error);
   }
 };
 
-const updatePayment = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Payment update controller placeholder',
-      id: req.params.id
-    }
-  });
+const downloadBill = async (req, res, next) => {
+  try {
+    const buffer = await paymentService.buildBillBuffer(req.params.orderId);
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="bill-${req.params.orderId}.pdf"`);
+    res.status(200).send(buffer);
+  } catch (error) {
+    next(error);
+  }
 };
 
-const deletePayment = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Payment deletion controller placeholder',
-      id: req.params.id
-    }
-  });
+const emailBill = async (req, res, next) => {
+  try {
+    const data = await paymentService.emailBill({
+      orderId: req.params.orderId,
+      email: req.body.email
+    });
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
   listPayments,
-  getPaymentById,
-  createPayment,
-  updatePayment,
-  deletePayment
+  processPayment,
+  downloadBill,
+  emailBill
 };

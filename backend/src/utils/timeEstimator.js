@@ -1,7 +1,9 @@
-const estimateTime = () => {
+const estimateTime = ({ maxPrepTime = 0, activeOrders = 0 }) => {
+  const minutes = Number(maxPrepTime || 0) + Number(activeOrders || 0) * 2;
+
   return {
-    minutes: 0,
-    label: 'Not calculated'
+    minutes,
+    label: `${minutes} min`
   };
 };
 

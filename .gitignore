@@ -9,3 +9,4 @@ frontend/pos/node_modules/
 frontend/customer/node_modules/
 frontend/kitchen/node_modules/
 frontend/manager/node_modules/
+.local-postgres/

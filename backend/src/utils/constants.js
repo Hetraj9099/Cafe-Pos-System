@@ -1,5 +1,18 @@
 module.exports = {
-  ORDER_STATUS: ['CREATED', 'PREPARING', 'COMPLETED', 'PAID'],
-  PAYMENT_METHODS: ['CASH', 'UPI', 'CARD'],
-  DEFAULT_API_PREFIX: '/api'
+  DEFAULT_API_PREFIX: '/api',
+  ORDER_STATUS: ['created', 'sent', 'preparing', 'completed', 'paid'],
+  ORDER_SOURCES: ['POS', 'QR', 'RESERVATION'],
+  PAYMENT_METHODS: ['cash', 'card', 'upi'],
+  PAYMENT_STATUS: ['pending', 'completed'],
+  RESERVATION_STATUS: ['reserved', 'completed', 'cancelled'],
+  ATTENDANCE_STATUS: ['present', 'absent', 'leave'],
+  USER_ROLES: ['admin', 'staff'],
+  TABLE_STATUS: {
+    AVAILABLE: 'Available',
+    OCCUPIED: 'Occupied',
+    COOKING: 'Cooking',
+    READY: 'Ready',
+    RESERVED: 'Reserved',
+    PAID: 'Paid'
+  }
 };

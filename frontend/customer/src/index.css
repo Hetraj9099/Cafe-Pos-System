@@ -3,9 +3,13 @@
 @tailwind utilities;
 
 :root {
-  color: #022c22;
-  background-color: #f0fdf4;
-  font-family: Georgia, serif;
+  color: #0f172a;
+  background-color: #f4fff8;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -13,8 +17,14 @@ body {
   min-width: 320px;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.16), transparent 25%),
-    linear-gradient(180deg, #f0fdf4 0%, #ecfccb 100%);
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.18), transparent 22%),
+    linear-gradient(180deg, #f4fff8 0%, #dff7e8 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
 }
 
 #root {

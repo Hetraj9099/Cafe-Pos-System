@@ -1,52 +1,109 @@
+const attendanceModel = require('../models/attendance.model');
+const staffModel = require('../models/staff.model');
 const userModel = require('../models/user.model');
+const authService = require('../services/auth.service');
 
-const listUsers = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'User listing controller placeholder',
-      resource: userModel.tableName
-    }
-  });
+const listUsers = async (req, res, next) => {
+  try {
+    const data = await userModel.listUsers();
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const getUserById = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'User details controller placeholder',
-      id: req.params.id
+const getUserById = async (req, res, next) => {
+  try {
+    const data = await userModel.findById(req.params.id);
+
+    if (!data) {
+      const error = new Error('User not found.');
+      error.statusCode = 404;
+      throw error;
     }
-  });
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const createUser = async (req, res) => {
-  res.status(201).json({
-    success: true,
-    data: {
-      message: 'User creation controller placeholder'
-    }
-  });
+const createUser = async (req, res, next) => {
+  try {
+    const data = await userModel.createUser({
+      ...req.body,
+      password: authService.hashPassword(req.body.password)
+    });
+
+    res.status(201).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const updateUser = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'User update controller placeholder',
-      id: req.params.id
+const updateUser = async (req, res, next) => {
+  try {
+    const payload = { ...req.body };
+
+    if (payload.password) {
+      payload.password = authService.hashPassword(payload.password);
     }
-  });
+
+    const data = await userModel.updateUser(req.params.id, payload);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
-const deleteUser = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'User deletion controller placeholder',
-      id: req.params.id
-    }
-  });
+const deleteUser = async (req, res, next) => {
+  try {
+    const data = await userModel.deleteUser(req.params.id);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const listStaff = async (req, res, next) => {
+  try {
+    const data = await staffModel.listStaff();
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const createStaff = async (req, res, next) => {
+  try {
+    const data = await staffModel.createStaff(req.body);
+    res.status(201).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const listAttendance = async (req, res, next) => {
+  try {
+    const data = await attendanceModel.listAttendance(req.query.date || null);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const markAttendance = async (req, res, next) => {
+  try {
+    const data = await attendanceModel.upsertAttendance({
+      staffId: req.body.staffId,
+      date: req.body.date,
+      status: req.body.status
+    });
+
+    res.status(201).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
@@ -54,5 +111,9 @@ module.exports = {
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  listStaff,
+  createStaff,
+  listAttendance,
+  markAttendance
 };
