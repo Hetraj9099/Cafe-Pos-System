@@ -1,88 +1,66 @@
-const currency = (value) => `Rs. ${Number(value || 0).toFixed(2)}`;
+import { Link, useLocation } from 'react-router-dom';
 
-const CartSheet = ({
-  open,
-  cart,
-  onClose,
-  onIncrement,
-  onDecrement,
-  onCheckout
-}) => {
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+const navItems = [
+  { to: '/reserve', label: 'Reserve' }
+];
+
+const AppShell = ({ children }) => {
+  const location = useLocation();
+  const isQrFlow =
+    location.pathname.startsWith('/order/') ||
+    location.pathname.startsWith('/menu/') ||
+    location.pathname.startsWith('/legacy-order/');
 
   return (
-    <div
-      className={`fixed inset-0 z-30 transition ${
-        open ? 'pointer-events-auto bg-black/30' : 'pointer-events-none bg-transparent'
-      }`}
-    >
-      <div
-        className={`absolute inset-x-0 bottom-0 mx-auto max-w-md rounded-t-[30px] bg-white p-5 shadow-2xl transition ${
-          open ? 'translate-y-0' : 'translate-y-full'
-        }`}
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900">Your Cart</h2>
-          <button className="text-sm font-medium text-emerald-700" onClick={onClose}>
-            Close
-          </button>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {cart.length === 0 ? (
-            <p className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
-              Add items to get started.
-            </p>
-          ) : (
-            cart.map((item) => (
-              <div
-                key={item.productId}
-                className="rounded-2xl border border-slate-100 bg-slate-50 p-4"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-semibold text-slate-900">{item.name}</h3>
-                    <p className="text-sm text-slate-500">{currency(item.price)}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      className="h-8 w-8 rounded-full bg-white text-lg"
-                      onClick={() => onDecrement(item.productId)}
-                    >
-                      -
-                    </button>
-                    <span className="min-w-6 text-center text-sm font-semibold">
-                      {item.quantity}
-                    </span>
-                    <button
-                      className="h-8 w-8 rounded-full bg-emerald-900 text-lg text-white"
-                      onClick={() => onIncrement(item.productId)}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
+    <div className="min-h-screen bg-[#f5f5f5] text-slate-900">
+      <div className="mx-auto min-h-screen max-w-[1440px] px-4 pb-20 pt-4 sm:px-6 lg:px-8">
+        <header className="rounded-xl border border-slate-200 bg-white p-4 shadow-md lg:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-violet-600">
+                POS Cafe
+              </p>
+              <h1 className="mt-2 text-2xl font-medium text-slate-950 lg:text-4xl">
+                {isQrFlow ? 'QR Table Ordering' : 'Guest Ordering'}
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm text-slate-500 lg:text-base">
+                {isQrFlow
+                  ? 'Scan, confirm your details, order from your table, and pay by UPI or card without picking a table manually.'
+                  : 'Reserve a table or order directly from your table with a clean, guided guest flow.'}
+              </p>
+            </div>
+            <div className="flex flex-col items-start gap-3 lg:items-end">
+              <div className="rounded-lg bg-violet-100 px-4 py-2 text-xs font-medium uppercase tracking-[0.24em] text-violet-700">
+                {isQrFlow ? 'QR Guest Portal' : 'Guest Portal'}
               </div>
-            ))
-          )}
-        </div>
-
-        <div className="mt-5 rounded-2xl bg-emerald-950 p-4 text-white">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-emerald-100">Estimated total</span>
-            <span className="text-lg font-semibold">{currency(total)}</span>
+              {!isQrFlow ? (
+                <nav className="flex flex-wrap gap-2">
+                  {navItems.map((item) => {
+                    const active = location.pathname.startsWith(item.to);
+                    return (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                          active
+                            ? 'bg-violet-600 text-white shadow-sm'
+                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        }`}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
+                </nav>
+              ) : null}
+            </div>
           </div>
-          <button
-            className="mt-4 w-full rounded-2xl bg-white px-4 py-3 text-base font-semibold text-emerald-950 disabled:opacity-50"
-            onClick={onCheckout}
-            disabled={cart.length === 0}
-          >
-            Continue to Checkout
-          </button>
-        </div>
+        </header>
+
+        <main className="mt-4">{children}</main>
       </div>
     </div>
   );
 };
 
-export default CartSheet;
+export default AppShell;

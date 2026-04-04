@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from 'react';
 
-const STORAGE_KEY = 'pos-cafe-customer-state';
+const STORAGE_KEY = 'pos-cafe-customer-state-v2';
 
 const defaultState = {
   module: 'customer',
@@ -12,6 +12,7 @@ const defaultState = {
   },
   cart: [],
   checkoutMode: 'order',
+  preferredPaymentMethod: 'upi',
   latestOrder: null,
   latestReservation: null
 };
@@ -50,6 +51,10 @@ export const AppProvider = ({ children }) => {
 
   const setCheckoutMode = (checkoutMode) => {
     setState((current) => ({ ...current, checkoutMode }));
+  };
+
+  const setPreferredPaymentMethod = (preferredPaymentMethod) => {
+    setState((current) => ({ ...current, preferredPaymentMethod }));
   };
 
   const addToCart = (product) => {
@@ -110,7 +115,8 @@ export const AppProvider = ({ children }) => {
     setState((current) => ({
       ...current,
       cart: [],
-      checkoutMode: 'order'
+      checkoutMode: 'order',
+      preferredPaymentMethod: 'upi'
     }));
   };
 
@@ -121,6 +127,7 @@ export const AppProvider = ({ children }) => {
         updateCustomer,
         setTable,
         setCheckoutMode,
+        setPreferredPaymentMethod,
         addToCart,
         updateCartQuantity,
         clearCart,
