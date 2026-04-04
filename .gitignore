@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.DS_Store
+coverage/
+*.log
+backend/node_modules/
+frontend/pos/node_modules/
+frontend/customer/node_modules/
+frontend/kitchen/node_modules/
+frontend/manager/node_modules/

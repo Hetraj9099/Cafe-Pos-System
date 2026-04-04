@@ -1,0 +1,13 @@
+{
+  "name": "restaurant-pos-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:backend": "npm --prefix backend run dev",
+    "start:backend": "npm --prefix backend run start",
+    "dev:pos": "npm --prefix frontend/pos run dev",
+    "dev:customer": "npm --prefix frontend/customer run dev",
+    "dev:kitchen": "npm --prefix frontend/kitchen run dev",
+    "dev:manager": "npm --prefix frontend/manager run dev"
+  }
+}

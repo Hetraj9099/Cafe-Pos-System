@@ -1,0 +1,2 @@
+-- Database seed placeholder
+-- Add minimal non-production seed statements here when development data is needed.

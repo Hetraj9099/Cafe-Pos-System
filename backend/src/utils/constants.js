@@ -1,0 +1,5 @@
+module.exports = {
+  ORDER_STATUS: ['CREATED', 'PREPARING', 'COMPLETED', 'PAID'],
+  PAYMENT_METHODS: ['CASH', 'UPI', 'CARD'],
+  DEFAULT_API_PREFIX: '/api'
+};

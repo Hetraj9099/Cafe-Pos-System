@@ -1,0 +1,5 @@
+-- Restaurant POS database schema placeholder
+-- Add table definitions, relationships, indexes, and constraints here.
+-- Suggested domains:
+-- users, customers, staff, attendance, tables, products,
+-- orders, order_items, payments, sessions, reservations, preorders
