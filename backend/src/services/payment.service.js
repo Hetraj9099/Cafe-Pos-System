@@ -1,5 +1,6 @@
 const orderModel = require('../models/order.model');
 const paymentModel = require('../models/payment.model');
+const reservationModel = require('../models/reservation.model');
 const { PAYMENT_METHODS } = require('../utils/constants');
 const orderService = require('./order.service');
 const pdfService = require('./pdf.service');
@@ -35,6 +36,13 @@ const processPayment = async ({ orderId, paymentMethod, amount }) => {
   });
 
   await orderModel.updateOrder(orderId, { status: 'paid' });
+
+  if (order.table_id) {
+    await reservationModel.completeActiveReservationsUpToTime(
+      order.table_id,
+      order.created_at || new Date().toISOString()
+    );
+  }
 
   return {
     payment,

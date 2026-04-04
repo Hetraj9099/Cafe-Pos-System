@@ -24,7 +24,28 @@ const generateBillPdfBuffer = ({ order, payments }) => {
     doc.fontSize(14).text('Items');
     doc.moveDown(0.5);
 
-    order.items.forEach((item) => {
+    const mergedItems = [];
+    const groupedItems = new Map();
+
+    (order.items || []).forEach((item) => {
+      const key = item.product_id || item.product_name;
+      const existing = groupedItems.get(key);
+
+      if (existing) {
+        existing.quantity += Number(item.quantity || 0);
+        existing.total_price += Number(item.total_price || 0);
+      } else {
+        groupedItems.set(key, {
+          ...item,
+          quantity: Number(item.quantity || 0),
+          total_price: Number(item.total_price || 0)
+        });
+      }
+    });
+
+    groupedItems.forEach((item) => mergedItems.push(item));
+
+    mergedItems.forEach((item) => {
       doc
         .fontSize(11)
         .text(
