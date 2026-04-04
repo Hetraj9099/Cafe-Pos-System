@@ -26,6 +26,14 @@ VALUES
   (4, 'table-d4', 6)
 ON CONFLICT (table_number) DO NOTHING;
 
+INSERT INTO cuisines (name)
+VALUES
+  ('Pizza'),
+  ('Pasta'),
+  ('Wraps'),
+  ('Beverages')
+ON CONFLICT (name) DO NOTHING;
+
 INSERT INTO products (name, category, price, tax, prep_time_minutes, is_active)
 SELECT seed.name, seed.category, seed.price, seed.tax, seed.prep_time_minutes, seed.is_active
 FROM (

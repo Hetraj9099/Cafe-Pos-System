@@ -8,20 +8,21 @@ const AppShell = ({ children }) => {
   const navItems = [
     { to: '/pos', label: 'Floor' },
     { to: '/orders', label: 'Orders' },
+    { to: '/history', label: 'History' },
     { to: '/payment', label: 'Payment' }
   ];
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fffef8_0%,#eef2ff_100%)] text-slate-900">
-      <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <header className="rounded-[32px] border border-slate-200 bg-white/95 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.08)]">
+    <div className="min-h-screen bg-[#f5f5f5] text-slate-900">
+      <div className="mx-auto max-w-[1600px] px-4 py-4 sm:px-6 lg:px-8">
+        <header className="rounded-xl border border-slate-200 bg-white p-4 shadow-md">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.34em] text-amber-600">
+              <p className="text-xs font-medium uppercase tracking-[0.3em] text-violet-600">
                 POS Cafe
               </p>
-              <h1 className="mt-2 text-3xl font-bold text-slate-950">Cashier Control</h1>
-              <p className="mt-2 text-sm text-slate-600">
+              <h1 className="mt-2 text-2xl font-medium text-slate-950">Cashier POS</h1>
+              <p className="mt-1 text-sm text-slate-500">
                 Signed in as {user?.name || 'Guest'}{session ? ' with an open session' : ''}.
               </p>
             </div>
@@ -37,8 +38,10 @@ const AppShell = ({ children }) => {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className={`rounded-full px-4 py-2 text-sm font-medium ${
-                      active ? 'bg-slate-950 text-white' : 'bg-slate-100 text-slate-700'
+                    className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                      active
+                        ? 'bg-violet-600 text-white shadow-sm'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
                     {item.label}
@@ -46,7 +49,7 @@ const AppShell = ({ children }) => {
                 );
               })}
               <button
-                className="rounded-full bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900"
+                className="rounded-lg bg-violet-100 px-4 py-2 text-sm font-medium text-violet-700 transition hover:bg-violet-200"
                 onClick={logout}
               >
                 Logout
@@ -55,7 +58,7 @@ const AppShell = ({ children }) => {
           </div>
         </header>
 
-        <main className="mt-6">{children}</main>
+        <main className="mt-4">{children}</main>
       </div>
     </div>
   );

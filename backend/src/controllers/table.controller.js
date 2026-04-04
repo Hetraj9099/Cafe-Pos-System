@@ -1,10 +1,10 @@
 const tableModel = require('../models/table.model');
 const generateToken = require('../utils/generateToken');
-const { TABLE_STATUS } = require('../utils/constants');
+const { TABLE_STATUS, TABLE_STATUS_VALUES } = require('../utils/constants');
 const qrService = require('../services/qr.service');
 
 const mapTableStatus = (orderStatus, hasReservation) => {
-  if (hasReservation && !orderStatus) {
+  if (hasReservation && (!orderStatus || orderStatus === 'created')) {
     return TABLE_STATUS.RESERVED;
   }
 
@@ -17,28 +17,51 @@ const mapTableStatus = (orderStatus, hasReservation) => {
     case 'completed':
       return TABLE_STATUS.READY;
     case 'paid':
-      return TABLE_STATUS.PAID;
+      return TABLE_STATUS.AVAILABLE;
     default:
       return TABLE_STATUS.AVAILABLE;
   }
 };
 
 const buildTableStatuses = async () => {
+  const reservationWindowStart = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const reservationWindowEnd = new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString();
   const [tables, latestOrders, reservations] = await Promise.all([
     tableModel.listTables(),
     tableModel.getLatestOrdersByTable(),
-    tableModel.getActiveReservations(new Date().toISOString(), new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString())
+    tableModel.getActiveReservations(reservationWindowStart, reservationWindowEnd)
   ]);
 
   const orderByTable = new Map(latestOrders.map((order) => [order.table_id, order]));
-  const reservedTables = new Set(reservations.map((reservation) => reservation.table_id));
+  const reservationByTable = new Map(
+    reservations
+      .sort(
+        (left, right) =>
+          new Date(left.reservation_time).getTime() - new Date(right.reservation_time).getTime()
+      )
+      .map((reservation) => [reservation.table_id, reservation])
+  );
 
   return tables.map((table) => {
     const latestOrder = orderByTable.get(table.id);
+    const activeReservation = reservationByTable.get(table.id) || null;
+    const reservationServed =
+      Boolean(activeReservation) &&
+      latestOrder?.status === 'paid' &&
+      new Date(latestOrder.created_at).getTime() >= new Date(activeReservation.created_at).getTime();
+    const effectiveReservation = reservationServed ? null : activeReservation;
+    const derivedStatus = mapTableStatus(latestOrder?.status, Boolean(effectiveReservation));
+    const manualStatus = TABLE_STATUS_VALUES.includes(table.manual_status)
+      ? table.manual_status
+      : null;
+
     return {
       ...table,
-      status: mapTableStatus(latestOrder?.status, reservedTables.has(table.id)),
-      latest_order: latestOrder || null
+      status: manualStatus || derivedStatus,
+      derived_status: derivedStatus,
+      manual_status: manualStatus,
+      latest_order: latestOrder || null,
+      active_reservation: effectiveReservation
     };
   });
 };
@@ -86,7 +109,17 @@ const createTable = async (req, res, next) => {
 
 const updateTable = async (req, res, next) => {
   try {
-    const data = await tableModel.updateTable(req.params.id, req.body);
+    const updatedTable = await tableModel.updateTable(req.params.id, req.body);
+
+    if (!updatedTable) {
+      const error = new Error('Table not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const statuses = await buildTableStatuses();
+    const data = statuses.find((table) => table.id === req.params.id);
+
     res.status(200).json({ success: true, data });
   } catch (error) {
     next(error);

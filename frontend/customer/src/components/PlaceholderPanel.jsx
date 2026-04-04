@@ -8,4 +8,3 @@ const PlaceholderPanel = ({ title, description }) => {
 };
 
 export default PlaceholderPanel;
-Code.txt

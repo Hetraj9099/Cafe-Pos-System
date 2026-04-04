@@ -42,6 +42,52 @@ const createUser = async ({ name, email, password, role }) => {
   return rows[0];
 };
 
+const storePasswordResetOtp = async ({ userId, otpHash, expiresAt }) => {
+  const { rows } = await query(
+    `
+      UPDATE users
+      SET reset_otp_hash = $1,
+          reset_otp_expires_at = $2
+      WHERE id = $3
+      RETURNING id, name, email, role, created_at
+    `,
+    [otpHash, expiresAt, userId]
+  );
+
+  return rows[0] || null;
+};
+
+const clearPasswordResetOtp = async (userId) => {
+  const { rows } = await query(
+    `
+      UPDATE users
+      SET reset_otp_hash = NULL,
+          reset_otp_expires_at = NULL
+      WHERE id = $1
+      RETURNING id, name, email, role, created_at
+    `,
+    [userId]
+  );
+
+  return rows[0] || null;
+};
+
+const updatePassword = async (userId, password) => {
+  const { rows } = await query(
+    `
+      UPDATE users
+      SET password = $1,
+          reset_otp_hash = NULL,
+          reset_otp_expires_at = NULL
+      WHERE id = $2
+      RETURNING id, name, email, role, created_at
+    `,
+    [password, userId]
+  );
+
+  return rows[0] || null;
+};
+
 const updateUser = async (id, payload) => {
   const { setClause, values } = buildUpdateClause(payload);
 
@@ -77,6 +123,9 @@ module.exports = {
   findById,
   listUsers,
   createUser,
+  storePasswordResetOtp,
+  clearPasswordResetOtp,
+  updatePassword,
   updateUser,
   deleteUser
 };

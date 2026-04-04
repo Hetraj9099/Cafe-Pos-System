@@ -28,9 +28,50 @@ export const managerApi = {
       method: 'POST',
       body: JSON.stringify(payload)
     }),
+  register: (payload) =>
+    request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+  forgotPassword: (payload) =>
+    request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+  resetPassword: (payload) =>
+    request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
   getOverview: (token) =>
     request('/dashboard/overview', {
       headers: authHeaders(token)
+    }),
+  listCuisines: (token) =>
+    request('/products/cuisines', {
+      headers: authHeaders(token)
+    }),
+  createCuisine: (token, payload) =>
+    request('/products/cuisines', {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload)
+    }),
+  listProducts: (token) =>
+    request('/products', {
+      headers: authHeaders(token)
+    }),
+  createProduct: (token, payload) =>
+    request('/products', {
+      method: 'POST',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload)
+    }),
+  updateProduct: (token, productId, payload) =>
+    request(`/products/${productId}`, {
+      method: 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload)
     }),
   listStaff: (token) =>
     request('/users/staff', {
@@ -41,6 +82,17 @@ export const managerApi = {
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify(payload)
+    }),
+  updateStaff: (token, staffId, payload) =>
+    request(`/users/staff/${staffId}`, {
+      method: 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload)
+    }),
+  deleteStaff: (token, staffId) =>
+    request(`/users/staff/${staffId}`, {
+      method: 'DELETE',
+      headers: authHeaders(token)
     }),
   listAttendance: (token, date = '') =>
     request(`/users/attendance${date ? `?date=${encodeURIComponent(date)}` : ''}`, {

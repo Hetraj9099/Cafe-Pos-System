@@ -2,9 +2,12 @@ const customerModel = require('../models/customer.model');
 const orderItemModel = require('../models/orderItem.model');
 const orderModel = require('../models/order.model');
 const productModel = require('../models/product.model');
+const reservationModel = require('../models/reservation.model');
 const tableModel = require('../models/table.model');
+const { ensureEmail, ensureName } = require('./auth.service');
 const estimateTime = require('../utils/timeEstimator');
 const { ORDER_SOURCES, ORDER_STATUS } = require('../utils/constants');
+const phonePattern = /^[0-9]{10}$/;
 
 const ensureOrderExists = async (orderId) => {
   const order = await orderModel.findById(orderId);
@@ -24,6 +27,27 @@ const enrichOrder = async (order) => {
     ...order,
     items
   };
+};
+
+const createOrMergeOrderItem = async ({ orderId, product, quantity }) => {
+  const existingItem = await orderItemModel.findByOrderAndProduct(orderId, product.id);
+
+  if (existingItem) {
+    const nextQuantity = Number(existingItem.quantity || 0) + Number(quantity || 0);
+    return orderItemModel.updateQuantity(
+      existingItem.id,
+      nextQuantity,
+      Number(product.price) * nextQuantity
+    );
+  }
+
+  return orderItemModel.createOrderItem({
+    orderId,
+    productId: product.id,
+    quantity,
+    unitPrice: Number(product.price),
+    totalPrice: Number(product.price) * quantity
+  });
 };
 
 const syncOrderTotals = async (orderId) => {
@@ -55,13 +79,32 @@ const ensureCustomer = async (payload) => {
     return null;
   }
 
-  const existingCustomer = await customerModel.findByPhone(payload.customer.phone);
+  const safeCustomer = {
+    name: ensureName(payload.customer.name || ''),
+    phone: String(payload.customer.phone || '').trim(),
+    email: payload.customer.email ? ensureEmail(payload.customer.email) : null
+  };
+
+  if (!phonePattern.test(safeCustomer.phone)) {
+    const error = new Error('Phone number must contain exactly 10 digits.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const existingCustomer = await customerModel.findByPhone(safeCustomer.phone);
 
   if (existingCustomer) {
+    const hasChanges =
+      existingCustomer.name !== safeCustomer.name || existingCustomer.email !== safeCustomer.email;
+
+    if (hasChanges) {
+      await customerModel.updateCustomer(existingCustomer.id, safeCustomer);
+    }
+
     return existingCustomer.id;
   }
 
-  const customer = await customerModel.createCustomer(payload.customer);
+  const customer = await customerModel.createCustomer(safeCustomer);
   return customer.id;
 };
 
@@ -117,12 +160,10 @@ const createOrder = async (payload) => {
     }
 
     const quantity = Number(item.quantity || 1);
-    await orderItemModel.createOrderItem({
+    await createOrMergeOrderItem({
       orderId: order.id,
-      productId: product.id,
-      quantity,
-      unitPrice: Number(product.price),
-      totalPrice: Number(product.price) * quantity
+      product,
+      quantity
     });
   }
 
@@ -142,12 +183,10 @@ const addOrderItem = async (orderId, payload) => {
 
   const quantity = Number(payload.quantity || 1);
 
-  await orderItemModel.createOrderItem({
+  await createOrMergeOrderItem({
     orderId,
-    productId: product.id,
-    quantity,
-    unitPrice: Number(product.price),
-    totalPrice: Number(product.price) * quantity
+    product,
+    quantity
   });
 
   return syncOrderTotals(orderId);
@@ -155,9 +194,28 @@ const addOrderItem = async (orderId, payload) => {
 
 const removeOrderItem = async (orderId, itemId) => {
   await ensureOrderExists(orderId);
-  const deletedItem = await orderItemModel.deleteOrderItem(orderId, itemId);
+  const existingItem = await orderItemModel.findById(itemId);
 
-  if (!deletedItem) {
+  if (!existingItem || existingItem.order_id !== orderId) {
+    const error = new Error('Order item not found.');
+    error.statusCode = 404;
+    throw error;
+  }
+
+  let deletedItem = null;
+
+  if (Number(existingItem.quantity || 0) > 1) {
+    const nextQuantity = Number(existingItem.quantity) - 1;
+    await orderItemModel.updateQuantity(
+      existingItem.id,
+      nextQuantity,
+      Number(existingItem.unit_price) * nextQuantity
+    );
+  } else {
+    deletedItem = await orderItemModel.deleteOrderItem(orderId, itemId);
+  }
+
+  if (!deletedItem && Number(existingItem.quantity || 0) <= 1) {
     const error = new Error('Order item not found.');
     error.statusCode = 404;
     throw error;
@@ -173,8 +231,16 @@ const updateOrderStatus = async (orderId, status) => {
     throw error;
   }
 
-  await ensureOrderExists(orderId);
+  const order = await ensureOrderExists(orderId);
   const updatedOrder = await orderModel.updateOrder(orderId, { status });
+
+  if (order.table_id && ['sent', 'preparing', 'completed', 'paid'].includes(status)) {
+    await reservationModel.completeActiveReservationsUpToTime(
+      order.table_id,
+      order.created_at || new Date().toISOString()
+    );
+  }
+
   return enrichOrder(await orderModel.findById(updatedOrder.id));
 };
 

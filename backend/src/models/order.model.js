@@ -85,6 +85,7 @@ const listOrders = async ({ status, source, tableId, activeOnly } = {}) => {
         t.table_number,
         c.name AS customer_name,
         c.phone AS customer_phone,
+        c.email AS customer_email,
         COUNT(oi.id) AS item_count
       FROM orders o
       LEFT JOIN tables t ON t.id = o.table_id

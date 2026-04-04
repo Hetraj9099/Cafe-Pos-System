@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000/api';
 
 const request = async (path, options = {}) => {
   const { headers, ...restOptions } = options;
@@ -28,6 +28,21 @@ export const posApi = {
       method: 'POST',
       body: JSON.stringify(payload)
     }),
+  register: (payload) =>
+    request('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+  forgotPassword: (payload) =>
+    request('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
+  resetPassword: (payload) =>
+    request('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    }),
   getProfile: (token) =>
     request('/auth/profile', {
       headers: authHeaders(token)
@@ -44,14 +59,32 @@ export const posApi = {
       headers: authHeaders(token)
     }),
   listTables: () => request('/tables'),
+  listReservations: () => request('/reservations'),
   createTable: (token, payload) =>
     request('/tables', {
       method: 'POST',
       headers: authHeaders(token),
       body: JSON.stringify(payload)
     }),
+  updateTable: (token, tableId, payload) =>
+    request(`/tables/${tableId}`, {
+      method: 'PUT',
+      headers: authHeaders(token),
+      body: JSON.stringify(payload)
+    }),
   listProducts: () => request('/products?active=true'),
-  listOrders: () => request('/orders?activeOnly=true'),
+  listOrders: (filters = { activeOnly: true }) => {
+    const params = new URLSearchParams();
+
+    Object.entries(filters || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        params.set(key, String(value));
+      }
+    });
+
+    const query = params.toString();
+    return request(`/orders${query ? `?${query}` : ''}`);
+  },
   createOrder: (payload) =>
     request('/orders', {
       method: 'POST',
@@ -70,6 +103,11 @@ export const posApi = {
     request(`/orders/${orderId}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status })
+    }),
+  updateCustomer: (customerId, payload) =>
+    request(`/customers/${customerId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload)
     }),
   processPayment: (payload) =>
     request('/payments/process', {

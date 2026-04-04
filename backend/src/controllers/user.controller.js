@@ -83,6 +83,38 @@ const createStaff = async (req, res, next) => {
   }
 };
 
+const updateStaff = async (req, res, next) => {
+  try {
+    const data = await staffModel.updateStaff(req.params.id, req.body);
+
+    if (!data) {
+      const error = new Error('Staff member not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteStaff = async (req, res, next) => {
+  try {
+    const data = await staffModel.deleteStaff(req.params.id);
+
+    if (!data) {
+      const error = new Error('Staff member not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const listAttendance = async (req, res, next) => {
   try {
     const data = await attendanceModel.listAttendance(req.query.date || null);
@@ -114,6 +146,8 @@ module.exports = {
   deleteUser,
   listStaff,
   createStaff,
+  updateStaff,
+  deleteStaff,
   listAttendance,
   markAttendance
 };

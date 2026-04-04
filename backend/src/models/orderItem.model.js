@@ -13,6 +13,21 @@ const createOrderItem = async ({ orderId, productId, quantity, unitPrice, totalP
   return rows[0];
 };
 
+const findByOrderAndProduct = async (orderId, productId) => {
+  const { rows } = await query(
+    `
+      SELECT *
+      FROM order_items
+      WHERE order_id = $1 AND product_id = $2
+      ORDER BY id ASC
+      LIMIT 1
+    `,
+    [orderId, productId]
+  );
+
+  return rows[0] || null;
+};
+
 const listByOrderId = async (orderId) => {
   const { rows } = await query(
     `
@@ -41,6 +56,21 @@ const deleteOrderItem = async (orderId, itemId) => {
   const { rows } = await query(
     'DELETE FROM order_items WHERE order_id = $1 AND id = $2 RETURNING *',
     [orderId, itemId]
+  );
+
+  return rows[0] || null;
+};
+
+const updateQuantity = async (itemId, quantity, totalPrice) => {
+  const { rows } = await query(
+    `
+      UPDATE order_items
+      SET quantity = $1,
+          total_price = $2
+      WHERE id = $3
+      RETURNING *
+    `,
+    [quantity, totalPrice, itemId]
   );
 
   return rows[0] || null;
@@ -79,9 +109,11 @@ const getSummaryByOrderId = async (orderId) => {
 
 module.exports = {
   createOrderItem,
+  findByOrderAndProduct,
   listByOrderId,
   findById,
   deleteOrderItem,
+  updateQuantity,
   updatePrepared,
   getSummaryByOrderId
 };

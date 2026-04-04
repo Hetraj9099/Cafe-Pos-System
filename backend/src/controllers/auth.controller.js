@@ -27,8 +27,28 @@ const profile = async (req, res, next) => {
   }
 };
 
+const forgotPassword = async (req, res, next) => {
+  try {
+    const data = await authService.requestPasswordReset(req.body);
+    res.status(200).json({ success: true, data, message: data.message });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const resetPassword = async (req, res, next) => {
+  try {
+    const data = await authService.resetPasswordWithOtp(req.body);
+    res.status(200).json({ success: true, data, message: data.message });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   login,
   register,
-  profile
+  profile,
+  forgotPassword,
+  resetPassword
 };

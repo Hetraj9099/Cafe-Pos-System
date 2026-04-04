@@ -14,10 +14,20 @@ router.post(
   validate({
     name: { required: true, type: 'string' },
     role: { required: true, type: 'string' },
-    status: { required: true, type: 'string' }
+    status: { required: false, type: 'string' }
   }),
   userController.createStaff
 );
+router.put(
+  '/staff/:id',
+  validate({
+    name: { required: false, type: 'string' },
+    role: { required: false, type: 'string' },
+    status: { required: false, type: 'string' }
+  }),
+  userController.updateStaff
+);
+router.delete('/staff/:id', userController.deleteStaff);
 router.get('/attendance', userController.listAttendance);
 router.post(
   '/attendance',
