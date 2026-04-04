@@ -98,6 +98,10 @@ const SuccessPage = () => {
   };
 
   const finalizePayment = async () => {
+    if (processingPayment) {
+      return;
+    }
+
     if (!latestOrder?.id) {
       return;
     }
@@ -122,6 +126,10 @@ const SuccessPage = () => {
   };
 
   const handlePayment = async () => {
+    if (processingPayment) {
+      return;
+    }
+
     if (preferredPaymentMethod === 'cash') {
       await finalizePayment();
       return;

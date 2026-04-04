@@ -48,6 +48,10 @@ const PaymentScreen = () => {
   }, [activeOrder?.items]);
 
   const finalizePayment = async () => {
+    if (submitting) {
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError('');
@@ -74,6 +78,10 @@ const PaymentScreen = () => {
   };
 
   const submit = async () => {
+    if (submitting) {
+      return;
+    }
+
     if (!activeOrder) {
       setError('Select a table with an active order.');
       return;

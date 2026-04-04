@@ -93,6 +93,10 @@ const CheckoutPage = () => {
   };
 
   const handleSubmit = async () => {
+    if (submitting) {
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError('');

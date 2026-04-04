@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import qrDataUrl from '../assets/upi-qr.png';
 
 const formatCardNumber = (value) =>
@@ -25,11 +25,24 @@ const FakePaymentGateway = ({ open, method, amount, processing, onClose, onConfi
     return 'Payment gateway';
   }, [method]);
 
+  useEffect(() => {
+    if (!open) {
+      setCardHolder('');
+      setCardNumber('');
+      setCvv('');
+      setError('');
+    }
+  }, [open, method]);
+
   if (!open) {
     return null;
   }
 
   const confirmCard = () => {
+    if (processing) {
+      return;
+    }
+
     if (cardHolder.trim().length < 2) {
       setError('Enter the card holder name.');
       return;
@@ -111,7 +124,12 @@ const FakePaymentGateway = ({ open, method, amount, processing, onClose, onConfi
             </div>
             <button
               className="mt-4 w-full rounded-xl bg-violet-600 px-4 py-3 text-sm font-medium text-white transition hover:bg-violet-700 disabled:opacity-60"
-              onClick={onConfirm}
+              onClick={() => {
+                if (!processing) {
+                  setError('');
+                  onConfirm();
+                }
+              }}
               disabled={processing}
             >
               {processing ? 'Marking payment...' : 'Done'}

@@ -6,7 +6,7 @@ const AppShell = ({ children }) => {
           <p className="text-xs font-medium uppercase tracking-[0.3em] text-violet-600">
             Kitchen Display
           </p>
-          <h1 className="mt-2 text-2xl font-medium text-slate-950">Kitchen kanban</h1>
+          <h1 className="mt-2 text-2xl font-medium text-slate-950">Kitchen workflow</h1>
           <p className="mt-1 text-sm text-slate-500">
             Polling every few seconds to keep tickets, item prep, and status transitions in sync.
           </p>
