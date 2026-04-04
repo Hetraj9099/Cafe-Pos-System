@@ -46,6 +46,10 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS reset_otp_hash TEXT,
+  ADD COLUMN IF NOT EXISTS reset_otp_expires_at TIMESTAMPTZ;
+
 CREATE TABLE IF NOT EXISTS customers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
@@ -62,6 +66,25 @@ CREATE TABLE IF NOT EXISTS tables (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE tables
+  ADD COLUMN IF NOT EXISTS manual_status VARCHAR(20);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'tables_manual_status_check'
+  ) THEN
+    ALTER TABLE tables
+      ADD CONSTRAINT tables_manual_status_check
+      CHECK (
+        manual_status IS NULL OR
+        manual_status IN ('Available', 'Occupied', 'Cooking', 'Ready', 'Reserved', 'Paid')
+      );
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS products (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name VARCHAR(255) NOT NULL,
@@ -72,6 +95,23 @@ CREATE TABLE IF NOT EXISTS products (
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS cuisine_type VARCHAR(100),
+  ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+CREATE TABLE IF NOT EXISTS cuisines (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name VARCHAR(100) NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+INSERT INTO cuisines (name)
+SELECT DISTINCT category
+FROM products
+WHERE category IS NOT NULL
+  AND TRIM(category) <> ''
+ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
