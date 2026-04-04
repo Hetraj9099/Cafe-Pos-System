@@ -9,14 +9,13 @@ const listReservations = async (req, res, next) => {
   }
 };
 
-const getReservationById = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Reservation details controller placeholder',
-      id: req.params.id
-    }
-  });
+const getAvailability = async (req, res, next) => {
+  try {
+    const data = await reservationService.getAvailability(req.query.reservationTime);
+    res.status(200).json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const createReservation = async (req, res, next) => {
@@ -28,30 +27,8 @@ const createReservation = async (req, res, next) => {
   }
 };
 
-const updateReservation = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Reservation update controller placeholder',
-      id: req.params.id
-    }
-  });
-};
-
-const deleteReservation = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    data: {
-      message: 'Reservation deletion controller placeholder',
-      id: req.params.id
-    }
-  });
-};
-
 module.exports = {
   listReservations,
-  getReservationById,
-  createReservation,
-  updateReservation,
-  deleteReservation
+  getAvailability,
+  createReservation
 };
