@@ -1,38 +1,122 @@
-# Restaurant POS Monorepo
+# 🍽️ Smart Cafe Management System
 
-Production-oriented monorepo scaffold for a restaurant POS ecosystem with a shared Node.js/Express backend, PostgreSQL database layer, and four independent React frontends for customer, cashier, kitchen, and manager workflows.
+A full-stack restaurant management platform handling **Manager, POS, Kitchen, and Customer interfaces** with real-time workflow and full cloud deployment.
 
-## Tech Stack
+---
 
-- Backend: Node.js, Express, pg
-- Database: PostgreSQL (Neon-compatible)
-- Frontend: React, Vite, Tailwind CSS, React Router
-- Architecture: Clean architecture inspired structure with routes, controllers, services, and models
+## 🚀 Live Deployment
 
-## Project Structure
+### 🌐 Access Links
 
-- `backend/` shared API server
-- `frontend/pos/` cashier POS interface
-- `frontend/customer/` QR ordering and reservation interface
-- `frontend/kitchen/` kitchen display interface
-- `frontend/manager/` dashboard and staff interface
-- `frontend/shared/` shared UI and utility placeholders
-- `database/` SQL schema, seed, and migrations placeholders
-- `docs/` architecture and API documentation
+- **Customer Panel:** https://pos-customer.onrender.com/reserve  
+- **Kitchen Panel:** https://cafe-pos-system-5b0g.onrender.com/kitchen  
+- **POS Panel:** https://cafe-pos-system-flc5.onrender.com/pos  
+- **Manager Panel:** https://pos-manager-zish.onrender.com/manager  
+- **QR Self Ordering:** https://pos-customer.onrender.com/?qr=table-6e3221fa5260  
 
-## Setup
+---
 
-1. Copy `.env.example` to `.env` and update environment variables.
-2. Install backend dependencies with `npm install --prefix backend`.
-3. Install frontend dependencies for each app:
-   - `npm install --prefix frontend/pos`
-   - `npm install --prefix frontend/customer`
-   - `npm install --prefix frontend/kitchen`
-   - `npm install --prefix frontend/manager`
-4. Start the backend with `npm run dev:backend`.
-5. Start any frontend independently, for example `npm run dev:pos`.
+> ⚠️ **Cold Start Warning:**  
+Render free tier servers go to sleep after inactivity.  
+First request may take **30–60 seconds** to respond.
 
-## Notes
+---
 
-- This repository contains scaffold code only.
-- Business logic, domain rules, and production integrations are intentionally not implemented yet.
+## 👥 Team Members
+
+- Hetraj Chauhan
+- Paritosh Patel 
+- Vicky Goplani
+- Raj Sinha
+
+---
+
+## 🔑 Demo Credentials
+
+### Manager Panel
+- Email: admin123@gmail.com  
+- Password: Admin@123  
+
+### POS Panel
+- Email: cashier12345@.com  
+- Password: Cashier@123
+
+---
+
+## 🧠 Features
+
+### 📊 Manager Dashboard
+- Analytics (orders, revenue)
+- Menu CRUD operations
+- Role/user management
+- Reports and overview
+
+### 🧾 POS System
+- Fast order creation
+- Cart system
+- Live sync with kitchen
+- PDF bill generation
+
+### 👨‍🍳 Kitchen Panel
+- Live order queue
+- Status updates
+- Real-time workflow
+
+### 🧑‍💻 Customer Interface
+- Browse menu
+- Place orders
+- Email bill delivery
+
+### 📧 Email System
+- Brevo SMTP integration
+- Automated PDF billing
+
+---
+
+## 🗄️ Tech Stack
+
+- **Frontend:** React.js  
+- **Backend:** Node.js + Express  
+- **Database:** PostgreSQL (Neon)  
+- **Deployment:** Render  
+- **Email:** Brevo  
+
+---
+
+
+---
+
+## 💻 Running Locally (All Panels)
+
+> Each frontend (Manager, POS, Kitchen, Customer) runs separately.
+
+---
+
+### 1. Clone Repository
+
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+
+---
+---
+cd backend
+npm install
+---
+---
+PORT=5000
+DATABASE_URL=your_neon_db_url
+
+SMTP_HOST=smtp-relay.brevo.com
+SMTP_PORT=587
+SMTP_USER=your_brevo_user
+SMTP_PASS=your_brevo_key
+
+JWT_SECRET=your_secret
+---
+---
+npm run dev
+---
+access individual file directory 
+npm run build
+npm run dev
+---
