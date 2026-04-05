@@ -9,9 +9,10 @@ import { customerApi } from '../services/api';
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phonePattern = /^[0-9]{10}$/;
 
-const QrOrderPage = () => {
-  const { token } = useParams();
+const QrOrderPage = ({ tokenOverride = '' }) => {
+  const { token: routeToken } = useParams();
   const navigate = useNavigate();
+  const token = tokenOverride || routeToken || '';
   const {
     customer,
     cart,
@@ -38,6 +39,12 @@ const QrOrderPage = () => {
       : '';
 
   useEffect(() => {
+    if (!token) {
+      setError('QR token is missing.');
+      setLoading(false);
+      return;
+    }
+
     const load = async () => {
       try {
         setLoading(true);
