@@ -8,10 +8,10 @@ A full-stack restaurant management platform handling **Manager, POS, Kitchen, an
 
 ### 🌐 Access Links
 
-- **Customer Panel:** https://pos-customer.onrender.com/reserve  
-- **Kitchen Panel:** https://cafe-pos-system-5b0g.onrender.com/kitchen  
-- **POS Panel:** https://cafe-pos-system-flc5.onrender.com/pos  
-- **Manager Panel:** https://pos-manager-zish.onrender.com/manager  
+- **Customer Panel:** https://pos-customer.onrender.com 
+- **Kitchen Panel:** https://cafe-pos-system-5b0g.onrender.com
+- **POS Panel:** https://cafe-pos-system-flc5.onrender.com
+- **Manager Panel:** https://pos-manager-zish.onrender.com
 - **QR Self Ordering:** https://pos-customer.onrender.com/?qr=table-6e3221fa5260  
 
 ---
