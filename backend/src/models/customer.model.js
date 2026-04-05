@@ -23,7 +23,6 @@ const listCustomers = async () => {
       FROM customers c
       LEFT JOIN orders o ON o.customer_id = c.id
       GROUP BY c.id
-      ORDER BY c.created_at DESC
     `
   );
 

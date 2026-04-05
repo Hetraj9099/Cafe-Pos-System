@@ -84,6 +84,19 @@ const deleteOrder = async (req, res, next) => {
   }
 };
 
+import { generateBillPdf } from "../services/pdf.service.js";
+import { sendBillEmail } from "../services/email.service.js";
+
+const pdfBuffer = await generateBillPdf(order);
+
+if (customer.email) {
+  sendBillEmail({
+    to: customer.email,
+    pdfBuffer,
+    orderId: order.id,
+  });
+}
+
 module.exports = {
   listOrders,
   getKitchenOrders,
