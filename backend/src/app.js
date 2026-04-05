@@ -1,3 +1,6 @@
+app.get('/', (req, res) => {
+  res.send('POS Backend Running 🚀');
+});
 require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
