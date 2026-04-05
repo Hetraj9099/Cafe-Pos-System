@@ -48,16 +48,3 @@ module.exports = {
   downloadBill,
   emailBill
 };
-
-import { generateBillPdf } from "../services/pdf.service.js";
-import { sendBillEmail } from "../services/email.service.js";
-
-const pdfBuffer = await generateBillPdf(order);
-
-if (customer.email) {
-  sendBillEmail({
-    to: customer.email,
-    pdfBuffer,
-    orderId: order.id,
-  });
-}

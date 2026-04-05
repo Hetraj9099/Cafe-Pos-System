@@ -93,8 +93,12 @@ const SuccessPage = () => {
       return;
     }
 
-    const response = await customerApi.emailBill(latestOrder.id, customer.email);
-    setEmailStatus(response.data.message || 'Bill email request completed.');
+    try {
+      const response = await customerApi.emailBill(latestOrder.id, customer.email);
+      setEmailStatus(response.data.message || 'Bill email request completed.');
+    } catch (error) {
+      setEmailStatus(error.message);
+    }
   };
 
   const finalizePayment = async () => {
