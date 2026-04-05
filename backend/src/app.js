@@ -1,10 +1,11 @@
-app.get('/', (req, res) => {
-  res.send('POS Backend Running 🚀');
-});
 require('dotenv').config();
+
 const cors = require('cors');
 const express = require('express');
 
+const app = express(); // ✅ MUST BE FIRST
+
+// routes import
 const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const customerRoutes = require('./routes/customer.routes');
@@ -18,10 +19,14 @@ const dashboardRoutes = require('./routes/dashboard.routes');
 const errorMiddleware = require('./middleware/error.middleware');
 const { DEFAULT_API_PREFIX } = require('./utils/constants');
 
-const app = express();
-
+// middleware
 app.use(cors());
 app.use(express.json());
+
+// ✅ NOW safe to use app
+app.get('/', (req, res) => {
+  res.send('POS Backend Running 🚀');
+});
 
 app.get('/health', (req, res) => {
   res.status(200).json({
@@ -30,6 +35,7 @@ app.get('/health', (req, res) => {
   });
 });
 
+// routes
 app.use(`${DEFAULT_API_PREFIX}/auth`, authRoutes);
 app.use(`${DEFAULT_API_PREFIX}/users`, userRoutes);
 app.use(`${DEFAULT_API_PREFIX}/customers`, customerRoutes);
@@ -41,6 +47,7 @@ app.use(`${DEFAULT_API_PREFIX}/sessions`, sessionRoutes);
 app.use(`${DEFAULT_API_PREFIX}/reservations`, reservationRoutes);
 app.use(`${DEFAULT_API_PREFIX}/dashboard`, dashboardRoutes);
 
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
