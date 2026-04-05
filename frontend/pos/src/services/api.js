@@ -1,8 +1,10 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000/api';
+import API_BASE_URL from '../config/api';
+
+const API_ROOT = `${API_BASE_URL}/api`;
 
 const request = async (path, options = {}) => {
   const { headers, ...restOptions } = options;
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${API_ROOT}${path}`, {
     ...restOptions,
     headers: {
       'Content-Type': 'application/json',

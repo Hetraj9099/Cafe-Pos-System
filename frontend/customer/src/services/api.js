@@ -1,10 +1,12 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:5000/api';
+import API_BASE_URL from '../config/api';
+
+const API_ROOT = `${API_BASE_URL}/api`;
 
 const request = async (path, options = {}) => {
   let response;
 
   try {
-    response = await fetch(`${API_BASE_URL}${path}`, {
+    response = await fetch(`${API_ROOT}${path}`, {
       headers: {
         'Content-Type': 'application/json',
         ...(options.headers || {})
@@ -12,7 +14,7 @@ const request = async (path, options = {}) => {
       ...options
     });
   } catch (error) {
-    throw new Error('Backend server is not reachable. Make sure it is running on 127.0.0.1:5000.');
+    throw new Error('Backend server is not reachable right now.');
   }
 
   if (!response.ok) {
