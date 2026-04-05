@@ -1,7 +1,8 @@
+console.log("DB URL:", process.env.DATABASE_URL);
 const { Pool } = require('pg');
 const env = require('./env');
 
-const databaseUrl = env.databaseUrl || process.env.DATABASE_URL || '';
+const databaseUrl = process.env.DATABASE_URL;
 
 const pool = databaseUrl
   ? new Pool({
